@@ -135,5 +135,5 @@ def main():
                               else:
                                   st.write("Maaf atas ketidaknyamanannya. Kami akan mencoba memberikan rekomendasi yang lebih baik di lain waktu.")
 
-if __name__ == "_main_":
+if __name__ == "__main__":
     main()
