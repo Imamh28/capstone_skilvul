@@ -61,7 +61,7 @@ def get_genre_recommendations_with_preferences(selected_genres, reading_type, po
         recommended_books = recommended_books[recommended_books['num_pages'] <= 100]  # Example threshold, adjust as needed
 
     if popularity == 'Ya':
-        popular_titles = df.sort_values(by='average_rating', ascending=True)['title'].head(10).tolist()
+        popular_titles = df.sort_values(by='average_rating', ascending=False)['title'].head(10).tolist()
         popular_books_df = df[df['title'].isin(popular_titles)]
         recommended_books = pd.concat([recommended_books, popular_books_df])
 
