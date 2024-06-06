@@ -77,7 +77,7 @@ def get_user_feedback():
 
 # Main function
 def main():
-    st.title("Bookverse: Website yang membantu anda dalam mendapatkan rekomendasi bacaan untuk meningkatkan minat baca anda")
+    st.title("Bookverse: Website yang membantu dalam memberikan rekomendasi buku bacaan")
     st.markdown("---")
     st.write("Halo! Saya di sini untuk membantu Anda menemukan rekomendasi buku berdasarkan preferensi Anda.")
 
