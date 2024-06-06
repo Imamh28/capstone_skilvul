@@ -52,6 +52,7 @@ def get_genre_recommendations_with_preferences(selected_genres, reading_type, po
     sim_scores = list(enumerate(avg_sim_scores))
     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
     sim_scores = sim_scores[1:6]
+    print(sim_scores)
     book_indices = [i[0] for i in sim_scores]
     recommended_books = df.iloc[book_indices][['title', 'authors', 'average_rating', 'num_pages']]
 
@@ -87,7 +88,7 @@ def main():
         st.write(f"Hai {name}! Siap untuk menemukan buku-buku keren sesuai selera Anda? Ayo kita mulai!")
 
         top_25_genre = df_buku['categories'].value_counts().index[:25]
-        selected_genres = st.multiselect("Pilih genre/jenis buku favoritmu (Pilih 3 dari top 25 genre)", top_25_genre)
+        selected_genres = st.multiselect("Pilih genre/jenis buku favoritmu (top 25 genre)", top_25_genre)
 
         if selected_genres:
             reading_type = st.radio("Manakah tipe kamu saat membaca buku?", ('Menyelesaikan buku dalam sekali duduk', 'Santai dalam membaca'), index=None)
@@ -128,6 +129,8 @@ def main():
 
                                     st.write("Rekomendasi berdasarkan keseluruhan:")
                                     st.dataframe(recommended_books[['title', 'authors', 'average_rating']], use_container_width=True)
+
+                                    
                                     
                                     feedback = get_user_feedback()
                                     if feedback:
