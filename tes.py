@@ -61,7 +61,7 @@ def get_genre_recommendations_with_preferences(selected_genres, reading_type, po
         recommended_books = recommended_books[recommended_books['num_pages'] <= 100]  # Example threshold, adjust as needed
 
     if popularity == 'Ya':
-        popular_titles = df.sort_values(by='average_rating', ascending=False)['title'].head(10).tolist()
+        popular_titles = df.sort_values(by='average_rating', ascending=True)['title'].head(10).tolist()
         popular_books_df = df[df['title'].isin(popular_titles)]
         recommended_books = pd.concat([recommended_books, popular_books_df])
 
@@ -69,24 +69,27 @@ def get_genre_recommendations_with_preferences(selected_genres, reading_type, po
         similar_books, _ = get_genre_recommendations([selected_book], cosine_sim=cosine_sim, df=df)
         recommended_books = pd.concat([recommended_books, similar_books])
 
-    # Calculate new similarity scores based on updated recommended books
-    if not recommended_books.empty:
-        new_indices = recommended_books.index.tolist()
-        avg_new_sim_scores = np.mean(cosine_sim[new_indices], axis=0)
-        new_sim_scores = list(enumerate(avg_new_sim_scores))
-        new_sim_scores = sorted(new_sim_scores, key=lambda x: x[1], reverse=True)
-        new_sim_scores = new_sim_scores[1:6]
-    else:
-        new_sim_scores = []
+    # Remove duplicates and sort by overall_sim_scores
+    recommended_books = recommended_books.drop_duplicates()
 
-    return recommended_books.drop_duplicates(), new_sim_scores
+    # Calculate new similarity scores based on updated recommended books
+    new_indices = recommended_books.index.tolist()
+    avg_new_sim_scores = np.mean(cosine_sim[new_indices], axis=0)
+    new_sim_scores = list(enumerate(avg_new_sim_scores))
+    new_sim_scores = sorted(new_sim_scores, key=lambda x: x[1], reverse=True)
+    new_sim_scores = new_sim_scores[1:6]
+
+    # Map sim_scores to book indices
+    book_indices_ordered = [i[0] for i in new_sim_scores]
+    recommended_books = df.iloc[book_indices_ordered][['title', 'authors', 'average_rating', 'num_pages', 'categories']]
+
+    return recommended_books, new_sim_scores
 
 # Function to get user feedback
 def get_user_feedback():
     feedback = st.text_input("Masukkan feedback Anda di sini:")
     return feedback
 
-# Main function
 # Main function
 def main():
     st.title("Bookverse: Website yang memberikan rekomendasi buku bacaan untuk Anda")
