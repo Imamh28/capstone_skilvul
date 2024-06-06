@@ -55,20 +55,29 @@ def get_genre_recommendations_with_preferences(selected_genres, reading_type, po
     book_indices = [i[0] for i in sim_scores]
     recommended_books = df.iloc[book_indices][['title', 'authors', 'average_rating', 'num_pages']]
 
+    st.write("Books before preferences applied:", recommended_books)  # Debugging
+
     # Apply user preferences
     if reading_type == 'Menyelesaikan buku dalam sekali duduk':
         recommended_books = recommended_books[recommended_books['num_pages'] <= 150]  # Example threshold, adjust as needed
+
+    st.write("Books after reading_type applied:", recommended_books)  # Debugging
 
     if popularity == 'Ya':
         popular_titles = df.sort_values(by='average_rating', ascending=False)['title'].head(10).tolist()
         popular_books_df = df[df['title'].isin(popular_titles)]
         recommended_books = pd.concat([recommended_books, popular_books_df])
 
+    st.write("Books after popularity applied:", recommended_books)  # Debugging
+
     if rating_influence == 'Ya' and selected_book:
         similar_books, _ = get_genre_recommendations([selected_book], cosine_sim=cosine_sim, df=df)
         recommended_books = pd.concat([recommended_books, similar_books])
 
+    st.write("Books after rating_influence applied:", recommended_books)  # Debugging
+
     return recommended_books.drop_duplicates(), sim_scores
+
 
 # Function to get user feedback
 def get_user_feedback():
