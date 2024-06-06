@@ -39,7 +39,7 @@ def get_genre_recommendations(selected_genres, cosine_sim=cosine_sim, df=df_buku
     sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
     sim_scores = sim_scores[1:6]
     book_indices = [i[0] for i in sim_scores]
-    recommended_books = df.iloc[book_indices][['title', 'authors', 'average_rating']]
+    recommended_books = df.iloc[book_indices][['title', 'authors', 'categories']]
     return recommended_books, sim_scores
 
 # Function to get genre recommendations with user preferences
@@ -59,7 +59,7 @@ def get_genre_recommendations_with_preferences(selected_genres, reading_type, po
 
     # Apply user preferences
     if reading_type == 'Menyelesaikan buku dalam sekali duduk':
-        recommended_books = recommended_books[recommended_books['num_pages'] <= 350]  # Example threshold, adjust as needed
+        recommended_books = recommended_books[recommended_books['num_pages'] <= 100]  # Example threshold, adjust as needed
 
     st.write("Books after reading_type applied:", recommended_books)  # Debugging
 
@@ -138,7 +138,7 @@ def main():
                                     st.write(genre_sim_scores)
 
                                     st.write("Rekomendasi berdasarkan keseluruhan:")
-                                    st.dataframe(recommended_books[['title', 'authors', 'average_rating']], use_container_width=True)
+                                    st.dataframe(recommended_books[['title', 'authors', 'categories']], use_container_width=True)
 
                                     st.write("Similarity Scores untuk rekomendasi berdasarkan keseluruhan:")
                                     st.write(overall_sim_scores)
