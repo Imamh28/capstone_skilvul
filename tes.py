@@ -131,7 +131,7 @@ def main():
                                     st.dataframe(recommendations)
 
                                     st.write("Rekomendasi berdasarkan keseluruhan:")
-                                    st.dataframe(recommended_books[['title', 'authors', 'average_rating']])
+                                    st.dataframe(recommended_books[['title', 'authors', 'average_rating']], use_container_width=True)
                                     
                                     feedback = get_user_feedback()
                                     if feedback:
