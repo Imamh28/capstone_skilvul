@@ -59,7 +59,7 @@ def get_genre_recommendations_with_preferences(selected_genres, reading_type, po
 
     # Apply user preferences
     if reading_type == 'Menyelesaikan buku dalam sekali duduk':
-        recommended_books = recommended_books[recommended_books['num_pages'] <= 150]  # Example threshold, adjust as needed
+        recommended_books = recommended_books[recommended_books['num_pages'] <= 350]  # Example threshold, adjust as needed
 
     st.write("Books after reading_type applied:", recommended_books)  # Debugging
 
