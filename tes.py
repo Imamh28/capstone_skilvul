@@ -84,38 +84,34 @@ def main():
     name = st.text_input("Silakan masukkan nama Anda:")
 
     if name:
-        st.write(f"Hai {name}! Jelajahi berbagai buku yang kami sarankan berdasarkan preferensi Anda.")
+        st.write(f"Hai {name}! Siap untuk menemukan buku-buku keren sesuai selera Anda? Ayo kita mulai!")
 
         top_25_genre = df_buku['categories'].value_counts().index[:25]
         selected_genres = st.multiselect("Pilih genre/jenis buku favoritmu (Pilih 3 dari top 25 genre)", top_25_genre)
 
         if selected_genres:
-            st.write("Genre favoritmu adalah...")
             reading_type = st.radio("Manakah tipe kamu saat membaca buku?", ('Menyelesaikan buku dalam sekali duduk', 'Santai dalam membaca'), index=None)
 
             if reading_type:
-                st.write("Tipe membacamu adalah...")
                 popularity = st.radio("Apakah tingkat kepopuleran buku mempengaruhi keputusan Anda dalam memilih buku?", ('Ya', 'Tidak'), index=None)
 
                 if popularity:
-                    st.write("Tingkat kepopuleran buku mempengaruhi keputusan Anda dalam memilih buku...")
                     rating_influence = st.radio("Apakah rating buku mempengaruhi keputusan Anda dalam memilih buku?", ('Ya', 'Tidak'), index=None)
 
                     if rating_influence:
-                        st.write("Rating buku mempengaruhi keputusan Anda dalam memilih buku...")
-                        st.write("Pilih buku yang membuatmu tertarik:")
+                        st.write("Pilih judul buku yang membuatmu tertarik:")
                         popular_titles = df_buku.sort_values(by='average_rating', ascending=False)['title'].head(10).tolist()
                         popular_titles.insert(0, "Pilih buku...")  # Add placeholder
                         selected_book = st.selectbox("Pilih buku:", popular_titles, index=0)
 
                         if selected_book != "Pilih buku...":
-                            st.write("Berikut adalah ringkasan pilihan Anda:")
-                            st.write(f"Nama: {name}")
-                            st.write(f"Genre Favorit: {', '.join(selected_genres)}")
-                            st.write(f"Tipe Membaca: {reading_type}")
+                            st.write("Yuk, kita cek apa saja pilihan kamu:")
+                            st.write(f"Nama                : {name}")
+                            st.write(f"Genre Favorit       : {', '.join(selected_genres)}")
+                            st.write(f"Tipe Membaca        : {reading_type}")
                             st.write(f"Pengaruh Kepopuleran: {popularity}")
-                            st.write(f"Pengaruh Rating: {rating_influence}")
-                            st.write(f"Buku yang Dipilih: {selected_book}")
+                            st.write(f"Pengaruh Rating     : {rating_influence}")
+                            st.write(f"Judul buku yang tertarik   : {selected_book}")
 
                             confirm = st.button("Konfirmasi Pilihan")
                             if confirm:
