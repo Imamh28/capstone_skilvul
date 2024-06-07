@@ -30,60 +30,68 @@ popular_titles = {category: get_popular_title(df_buku, category) for category in
 
 # Function to get genre recommendations
 def get_genre_recommendations(selected_genres, cosine_sim=cosine_sim, df=df_buku):
-    indices = df.index[df['categories'].isin(selected_genres)].tolist()
-    if not indices:
-        return pd.DataFrame(), []
-
-    avg_sim_scores = np.mean(cosine_sim[indices], axis=0)
-    sim_scores = list(enumerate(avg_sim_scores))
-    sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
-    sim_scores = sim_scores[1:6]
-    book_indices = [i[0] for i in sim_scores]
-    recommended_books = df.iloc[book_indices][['title', 'authors', 'categories']]
-    return recommended_books, sim_scores
+    recommendations_by_genre = {}
+    genre_sim_scores = {}
+    for genre in selected_genres:
+        indices = df.index[df['categories'] == genre].tolist()
+        if not indices:
+            continue
+        avg_sim_scores = np.mean(cosine_sim[indices], axis=0)
+        sim_scores = list(enumerate(avg_sim_scores))
+        sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
+        sim_scores = sim_scores[:6]  # Get top 5 recommendations (skipping the first element)
+        book_indices = [i[0] for i in sim_scores]
+        recommended_books = df.iloc[book_indices][['title', 'authors', 'categories']]
+        recommendations_by_genre[genre] = recommended_books
+        genre_sim_scores[genre] = sim_scores
+    return recommendations_by_genre, genre_sim_scores
 
 # Function to get genre recommendations with user preferences
 def get_genre_recommendations_with_preferences(selected_genres, reading_type, popularity, rating_influence, selected_book, cosine_sim=cosine_sim, df=df_buku):
-    # Filter initial books based on genre
-    indices = df.index[df['categories'].isin(selected_genres)].tolist()
-    if not indices:
-        return pd.DataFrame(), []
+    all_recommended_books = []
+    all_sim_scores = []
 
-    avg_sim_scores = np.mean(cosine_sim[indices], axis=0)
-    initial_sim_scores = list(enumerate(avg_sim_scores))
-    initial_sim_scores = sorted(initial_sim_scores, key=lambda x: x[1], reverse=True)
-    initial_sim_scores = initial_sim_scores[1:6]
-    book_indices = [i[0] for i in initial_sim_scores]
-    recommended_books = df.iloc[book_indices][['title', 'authors', 'average_rating', 'num_pages']]
+    for genre in selected_genres:
+        indices = df.index[df['categories'] == genre].tolist()
+        if not indices:
+            continue
 
-    # Apply user preferences
-    if reading_type == 'Menyelesaikan buku dalam sekali duduk':
-        recommended_books = recommended_books[recommended_books['num_pages'] <= 100]  # Example threshold, adjust as needed
+        avg_sim_scores = np.mean(cosine_sim[indices], axis=0)
+        sim_scores = list(enumerate(avg_sim_scores))
+        sim_scores = sorted(sim_scores, key=lambda x: x[1], reverse=True)
+        sim_scores = sim_scores[:6]
+        book_indices = [i[0] for i in sim_scores]
+        recommended_books = df.iloc[book_indices][['title', 'authors', 'average_rating', 'num_pages', 'categories']]
 
-    if popularity == 'Ya':
-        popular_titles = df.sort_values(by='average_rating', ascending=True)['title'].head(10).tolist()
-        popular_books_df = df[df['title'].isin(popular_titles)]
-        recommended_books = pd.concat([recommended_books, popular_books_df])
+        # Apply user preferences
+        if reading_type == 'Menyelesaikan buku dalam sekali duduk':
+            recommended_books = recommended_books[recommended_books['num_pages'] <= 100]  # Example threshold, adjust as needed
 
-    if rating_influence == 'Ya' and selected_book:
-        similar_books, _ = get_genre_recommendations([selected_book], cosine_sim=cosine_sim, df=df)
-        recommended_books = pd.concat([recommended_books, similar_books])
+        if popularity == 'Ya':
+            popular_titles_list = df.sort_values(by='average_rating', ascending=True)['title'].head(10).tolist()
+            popular_books_df = df[df['title'].isin(popular_titles_list)]
+            recommended_books = pd.concat([recommended_books, popular_books_df])
 
-    # Remove duplicates and sort by overall_sim_scores
-    recommended_books = recommended_books.drop_duplicates()
+        if rating_influence == 'Ya' and selected_book:
+            similar_books, _ = get_genre_recommendations(selected_genres, cosine_sim=cosine_sim, df=df)
+            similar_books_list = []
+            for genre_books in similar_books.values():
+                similar_books_list.append(genre_books)
+            similar_books_df = pd.concat(similar_books_list)
+            recommended_books = pd.concat([recommended_books, similar_books_df])
 
-    # Calculate new similarity scores based on updated recommended books
-    new_indices = recommended_books.index.tolist()
-    avg_new_sim_scores = np.mean(cosine_sim[new_indices], axis=0)
-    new_sim_scores = list(enumerate(avg_new_sim_scores))
-    new_sim_scores = sorted(new_sim_scores, key=lambda x: x[1], reverse=True)
-    new_sim_scores = new_sim_scores[1:6]
+        # Remove duplicates and sort by overall_sim_scores
+        recommended_books = recommended_books.drop_duplicates()
+        new_indices = recommended_books.index.tolist()
+        avg_new_sim_scores = np.mean(cosine_sim[new_indices], axis=0)
+        new_sim_scores = list(enumerate(avg_new_sim_scores))
+        new_sim_scores = sorted(new_sim_scores, key=lambda x: x[1], reverse=True)
+        new_sim_scores = new_sim_scores[:6]
 
-    # Map sim_scores to book indices
-    book_indices_ordered = [i[0] for i in new_sim_scores]
-    recommended_books = df.iloc[book_indices_ordered][['title', 'authors', 'average_rating', 'num_pages', 'categories']]
+        all_recommended_books.append(recommended_books)
+        all_sim_scores.extend(new_sim_scores)
 
-    return recommended_books, new_sim_scores
+    return pd.concat(all_recommended_books), all_sim_scores
 
 # Function to get user feedback
 def get_user_feedback():
@@ -131,23 +139,24 @@ def main():
                             confirm = st.button("Konfirmasi Pilihan")
                             if confirm:
                                 st.write("Berikut beberapa buku yang mungkin menarik bagi Anda:")
-                                recommendations, genre_sim_scores = get_genre_recommendations(selected_genres)
+                                recommendations_by_genre, genre_sim_scores = get_genre_recommendations(selected_genres)
                                 recommended_books, overall_sim_scores = get_genre_recommendations_with_preferences(selected_genres, reading_type, popularity, rating_influence, selected_book)
 
-                                if recommendations.empty:
+                                if not recommendations_by_genre:
                                     st.write("Maaf, kami tidak dapat menemukan rekomendasi berdasarkan genre yang dipilih.")
                                 else:
-                                    st.write("Rekomendasi berdasarkan genre:")
-                                    st.dataframe(recommendations)
+                                    for genre, recommendations in recommendations_by_genre.items():
+                                        st.write(f"Rekomendasi berdasarkan genre {genre}:")
+                                        st.dataframe(recommendations)
 
-                                    st.write("Similarity Scores untuk rekomendasi berdasarkan genre:")
-                                    st.write(genre_sim_scores)
+                                        st.write(f"Similarity Scores untuk rekomendasi berdasarkan genre {genre}:")
+                                        st.write(genre_sim_scores[genre])
 
                                     st.write("Rekomendasi berdasarkan keseluruhan:")
-                                    st.dataframe(recommended_books[['title', 'authors', 'categories']], use_container_width=True)
+                                    st.dataframe(recommended_books[['title', 'authors', 'categories']].head(15), use_container_width=True)  # Display top 15 results
 
                                     st.write("Similarity Scores untuk rekomendasi berdasarkan keseluruhan:")
-                                    st.write(overall_sim_scores)
+                                    st.write(overall_sim_scores[:15])  # Display top 15 similarity scores
 
                                 feedback = get_user_feedback()
                                 if feedback:
