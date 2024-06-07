@@ -3,13 +3,18 @@ import pandas as pd
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from nltk.stem import WordNetLemmatizer
 
 # Load dataset
 df_buku = pd.read_csv('books.csv')
 df_buku['description'] = df_buku['description'].fillna('')
 
+# Pre-process text with lemmatization
+lemmatizer = WordNetLemmatizer()
+df_buku['description'] = df_buku['description'].apply(lambda x: ' '.join([lemmatizer.lemmatize(word) for word in x.split()]))
+
 # TF-IDF and cosine similarity
-tfidf_vectorizer = TfidfVectorizer(stop_words='english')
+tfidf_vectorizer = TfidfVectorizer(stop_words='english', max_df=0.8, min_df=2, ngram_range=(1, 2))
 tfidf_matrix = tfidf_vectorizer.fit_transform(df_buku['description'])
 cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
 
@@ -99,7 +104,7 @@ def get_popular_titles_by_genre(selected_genres, df=df_buku):
     for genre in selected_genres:
         category_df = df[df['categories'] == genre]
         if not category_df.empty:
-            popular_book = category_df.sort_values(by='average_rating', ascending=False).iloc[0]
+            popular_book = category_df.sort_values(by 'average_rating', ascending=False).iloc[0]
             popular_titles_by_genre.append(popular_book['title'])
     return popular_titles_by_genre
 
