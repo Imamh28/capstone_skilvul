@@ -93,6 +93,16 @@ def get_genre_recommendations_with_preferences(selected_genres, reading_type, po
 
     return pd.concat(all_recommended_books), all_sim_scores
 
+# Function to get popular titles by genre
+def get_popular_titles_by_genre(selected_genres, df=df_buku):
+    popular_titles_by_genre = []
+    for genre in selected_genres:
+        category_df = df[df['categories'] == genre]
+        if not category_df.empty:
+            popular_book = category_df.sort_values(by='average_rating', ascending=False).iloc[0]
+            popular_titles_by_genre.append(popular_book['title'])
+    return popular_titles_by_genre
+
 # Function to get user feedback
 def get_user_feedback():
     feedback = st.text_input("Masukkan feedback Anda di sini:")
@@ -122,8 +132,9 @@ def main():
                     rating_influence = st.radio("Apakah rating buku mempengaruhi keputusan Anda dalam memilih buku?", ('Ya', 'Tidak'), index=None)
 
                     if rating_influence:
+                        popular_titles = get_popular_titles_by_genre(selected_genres)
+
                         st.write("Pilih judul buku yang membuatmu tertarik:")
-                        popular_titles = df_buku.sort_values(by='average_rating', ascending=False)['title'].head(10).tolist()
                         popular_titles.insert(0, "Pilih buku...")  # Add placeholder
                         selected_book = st.selectbox("Pilih buku:", popular_titles, index=0)
 
@@ -153,10 +164,10 @@ def main():
                                         st.write(genre_sim_scores[genre])
 
                                     st.write("Rekomendasi berdasarkan keseluruhan:")
-                                    st.dataframe(recommended_books[['title', 'authors', 'categories']].head(15), use_container_width=True)  # Display top 15 results
+                                    st.dataframe(recommended_books[['title', 'authors', 'categories']].head(15))
 
                                     st.write("Similarity Scores untuk rekomendasi berdasarkan keseluruhan:")
-                                    st.write(overall_sim_scores[:15])  # Display top 15 similarity scores
+                                    st.write(overall_sim_scores[:15])
 
                                 feedback = get_user_feedback()
                                 if feedback:
