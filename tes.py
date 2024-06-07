@@ -162,12 +162,14 @@ def main():
 
                                         st.write(f"Similarity Scores untuk rekomendasi berdasarkan genre {genre}:")
                                         st.write(genre_sim_scores[genre])
+                                        print(genre_sim_scores[genre])
 
                                     st.write("Rekomendasi berdasarkan keseluruhan:")
                                     st.dataframe(recommended_books[['title', 'authors', 'categories']].head(15))
 
                                     st.write("Similarity Scores untuk rekomendasi berdasarkan keseluruhan:")
                                     st.write(overall_sim_scores[:15])
+                                    print(overall_sim_scores[:15])
 
                                 feedback = get_user_feedback()
                                 if feedback:
