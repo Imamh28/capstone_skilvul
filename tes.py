@@ -104,7 +104,7 @@ def get_popular_titles_by_genre(selected_genres, df=df_buku):
     for genre in selected_genres:
         category_df = df[df['categories'] == genre]
         if not category_df.empty:
-            popular_book = category_df.sort_values(by 'average_rating', ascending=False).iloc[0]
+            popular_book = category_df.sort_values(by='average_rating', ascending=False).iloc[0]
             popular_titles_by_genre.append(popular_book['title'])
     return popular_titles_by_genre
 
