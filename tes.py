@@ -20,7 +20,7 @@ service_url = 'https://api.au-syd.natural-language-understanding.watson.cloud.ib
 authenticator = IAMAuthenticator(api_key)
 nlu = NaturalLanguageUnderstandingV1(
     version='2021-08-01',
-    authenticator=authenticator
+    authenticator=authenticator,
     disable_ssl_verification=True  # Tambahkan opsi ini
 )
 
