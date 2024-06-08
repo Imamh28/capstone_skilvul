@@ -6,6 +6,10 @@ from sklearn.metrics.pairwise import cosine_similarity
 from ibm_watson import NaturalLanguageUnderstandingV1
 from ibm_watson.natural_language_understanding_v1 import Features, SentimentOptions
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+import http.client
+
+# Reset SSL context to avoid SSL certificate verification error
+http.client._create_default_https_context = http.client._create_unverified_context
 
 # Initialize IBM NLU
 api_key = 'sSXHNVTN-iWR7PhHP3t2lLFr2k7oYNn4YXYXBM99wesI'
@@ -18,7 +22,7 @@ nlu = NaturalLanguageUnderstandingV1(
 )
 
 # Set service URL
-nlu.set_service_url(service_url, verify=False)
+nlu.set_service_url(service_url)
 
 # Function to analyze feedback using IBM NLU
 def analyze_feedback(feedback_text):
@@ -32,7 +36,7 @@ def analyze_feedback(feedback_text):
     except Exception as e:
         st.error(f"Error analyzing feedback: {e}")
         return None
-
+        
 # Load dataset
 df_buku = pd.read_csv('books.csv')
 df_buku['description'] = df_buku['description'].fillna('')
