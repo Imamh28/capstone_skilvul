@@ -24,7 +24,8 @@ def analyze_feedback(feedback_text):
     try:
         response = nlu.analyze(
             text=feedback_text,
-            features=Features(sentiment=SentimentOptions())
+            features=Features(sentiment=SentimentOptions()),
+            verify=False
         ).get_result()
         sentiment = response['sentiment']['document']['label']
         return sentiment
