@@ -4,3 +4,4 @@ numpy
 scikit-learn
 ibm-watson
 ibm-cloud-sdk-core
+ssl
