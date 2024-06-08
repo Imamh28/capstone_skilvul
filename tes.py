@@ -6,6 +6,11 @@ from sklearn.metrics.pairwise import cosine_similarity
 from ibm_watson import NaturalLanguageUnderstandingV1
 from ibm_watson.natural_language_understanding_v1 import Features, SentimentOptions
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+import ssl
+
+ssl_context = ssl.create_default_context()
+ssl_context.check_hostname = False
+ssl_context.verify_mode = ssl.CERT_NONE
 
 # Initialize IBM NLU
 api_key = 'sSXHNVTN-iWR7PhHP3t2lLFr2k7oYNn4YXYXBM99wesI'
@@ -17,15 +22,14 @@ nlu = NaturalLanguageUnderstandingV1(
     authenticator=authenticator
 )
 
-nlu.set_service_url(service_url)
+nlu.set_service_url(service_url, ssl_context=ssl_context)
 
 # Function to analyze feedback using IBM NLU
 def analyze_feedback(feedback_text):
     try:
         response = nlu.analyze(
             text=feedback_text,
-            features=Features(sentiment=SentimentOptions()),
-            verify=False
+            features=Features(sentiment=SentimentOptions())
         ).get_result()
         sentiment = response['sentiment']['document']['label']
         return sentiment
