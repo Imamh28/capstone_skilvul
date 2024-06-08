@@ -3,6 +3,34 @@ import pandas as pd
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+from ibm_watson import NaturalLanguageUnderstandingV1
+from ibm_watson.natural_language_understanding_v1 import Features, SentimentOptions
+from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
+
+# Initialize IBM NLU
+api_key = 'sSXHNVTN-iWR7PhHP3t2lLFr2k7oYNn4YXYXBM99wesI'
+service_url = 'https://api.au-syd.natural-language-understanding.watson.cloud.ibm.com/instances/5cb19ae3-01a5-4a79-9e70-dc2d7a42af02'
+
+authenticator = IAMAuthenticator(api_key)
+nlu = NaturalLanguageUnderstandingV1(
+    version='2021-08-01',
+    authenticator=authenticator
+)
+nlu.set_service_url(service_url)
+
+# Function to analyze feedback using IBM NLU
+def analyze_feedback(feedback_text):
+    try:
+        response = nlu.analyze(
+            text=feedback_text,
+            features=Features(sentiment=SentimentOptions())
+        ).get_result()
+        sentiment = response['sentiment']['document']['label']
+        return sentiment
+    except Exception as e:
+        st.error(f"Error analyzing feedback: {e}")
+        return None
+
 
 # Load dataset
 df_buku = pd.read_csv('books.csv')
@@ -104,8 +132,17 @@ def get_popular_titles_by_genre(selected_genres, df=df_buku):
     return popular_titles_by_genre
 
 # Function to get user feedback
+# def get_user_feedback():
+#     feedback = st.text_input("Masukkan feedback Anda di sini:")
+#     return feedback
+
+# Function to get user feedback
 def get_user_feedback():
     feedback = st.text_input("Masukkan feedback Anda di sini:")
+    if feedback:
+        sentiment = analyze_feedback(feedback)
+        if sentiment:
+            st.write(f"Sentimen dari umpan balik Anda adalah: {sentiment}")
     return feedback
 
 # Main function
