@@ -193,14 +193,14 @@ def main():
                                     st.write("Maaf, kami tidak dapat menemukan rekomendasi berdasarkan genre yang dipilih.")
                                 else:
                                     for genre, recommendations in recommendations_by_genre.items():
-                                        st.write(f"Rekomendasi berdasarkan genre {genre}:")
+                                        st.write(f"Ini dia beberapa buku yang mungkin menarik bagimu berdasarkan genre {genre}:")
                                         st.dataframe(recommendations)
 
                                         st.write(f"Similarity Scores untuk rekomendasi berdasarkan genre {genre}:")
                                         st.write(genre_sim_scores[genre])
                                         print(genre_sim_scores[genre])
 
-                                    st.write("Rekomendasi berdasarkan keseluruhan:")
+                                    st.write("Lalu ini hasil rekomendasi buku berdasarkan semua pilihan kamu:")
                                     st.dataframe(recommended_books[['title', 'authors', 'categories']].head(15))
 
                                     st.write("Similarity Scores untuk rekomendasi berdasarkan keseluruhan:")
@@ -209,7 +209,7 @@ def main():
 
                                 feedback = get_user_feedback()
                                 if feedback:
-                                    st.write("Terima kasih atas umpan balik Anda!")
+                                    st.write("Terima kasih atas feedback yang kamu berikan!")
                                 else:
                                     st.write("Kami menunggu masukan dari Anda! Silakan isi feedback Anda di atas untuk membantu kami memberikan rekomendasi yang lebih baik.")
 
