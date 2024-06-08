@@ -31,7 +31,6 @@ def analyze_feedback(feedback_text):
         st.error(f"Error analyzing feedback: {e}")
         return None
 
-
 # Load dataset
 df_buku = pd.read_csv('books.csv')
 df_buku['description'] = df_buku['description'].fillna('')
@@ -132,17 +131,13 @@ def get_popular_titles_by_genre(selected_genres, df=df_buku):
     return popular_titles_by_genre
 
 # Function to get user feedback
-# def get_user_feedback():
-#     feedback = st.text_input("Masukkan feedback Anda di sini:")
-#     return feedback
-
-# Function to get user feedback
 def get_user_feedback():
     feedback = st.text_input("Masukkan feedback Anda di sini:")
     if feedback:
         sentiment = analyze_feedback(feedback)
         if sentiment:
             st.write(f"Sentimen dari umpan balik Anda adalah: {sentiment}")
+        st.session_state['feedback'] = feedback
     return feedback
 
 # Main function
@@ -184,8 +179,12 @@ def main():
                             st.write(f"Pengaruh Rating     : {rating_influence}")
                             st.write(f"Judul buku yang tertarik   : {selected_book}")
 
+                            if 'confirm' not in st.session_state:
+                                st.session_state.confirm = False
+
                             confirm = st.button("Konfirmasi Pilihan")
-                            if confirm:
+                            if confirm or st.session_state.confirm:
+                                st.session_state.confirm = True
                                 st.write("Berikut beberapa buku yang mungkin menarik bagi Anda:")
                                 recommendations_by_genre, genre_sim_scores = get_genre_recommendations(selected_genres)
                                 recommended_books, overall_sim_scores = get_genre_recommendations_with_preferences(selected_genres, reading_type, popularity, rating_influence, selected_book)
