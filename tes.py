@@ -144,4 +144,31 @@ def get_user_feedback():
 
 # Main function
 def main():
-    st
+    st.title('Rekomendasi Buku')
+    
+    # Sidebar
+    st.sidebar.title('Filter')
+    selected_genres = st.sidebar.multiselect('Pilih genre buku:', genre_popular)
+    reading_type = st.sidebar.selectbox('Bagaimana Anda membaca buku?', ['Menyelesaikan buku dalam sekali duduk', 'Tidak peduli'])
+    popularity = st.sidebar.selectbox('Apakah Anda tertarik pada buku populer?', ['Ya', 'Tidak'])
+    rating_influence = st.sidebar.selectbox('Apakah Anda ingin rekomendasi berdasarkan buku yang Anda sukai?', ['Ya', 'Tidak'])
+    selected_book = st.sidebar.selectbox('Pilih buku yang Anda sukai:', list(popular_titles.values()))
+
+    # Display recommendations
+    if st.button('Dapatkan Rekomendasi'):
+        st.header('Rekomendasi Buku Berdasarkan Genre')
+        recommendations, _ = get_genre_recommendations_with_preferences(selected_genres, reading_type, popularity, rating_influence, selected_book)
+        st.dataframe(recommendations)
+
+        # Get popular titles by selected genres
+        st.header('Buku Populer Berdasarkan Genre yang Dipilih')
+        popular_titles_genre = get_popular_titles_by_genre(selected_genres)
+        st.write(popular_titles_genre)
+
+        # Get user feedback
+        st.header('Analisis Sentimen Umpan Balik')
+        feedback = get_user_feedback()
+
+# Run the app
+if __name__ == '__main__':
+    main()
