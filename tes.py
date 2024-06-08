@@ -6,7 +6,6 @@ from sklearn.metrics.pairwise import cosine_similarity
 from ibm_watson import NaturalLanguageUnderstandingV1
 from ibm_watson.natural_language_understanding_v1 import Features, SentimentOptions
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
-import requests
 
 # Initialize IBM NLU
 api_key = 'sSXHNVTN-iWR7PhHP3t2lLFr2k7oYNn4YXYXBM99wesI'
@@ -17,8 +16,6 @@ nlu = NaturalLanguageUnderstandingV1(
     version='2021-08-01',
     authenticator=authenticator
 )
-
-# Set service URL
 nlu.set_service_url(service_url)
 
 # Function to analyze feedback using IBM NLU
@@ -140,6 +137,7 @@ def get_user_feedback():
         sentiment = analyze_feedback(feedback)
         if sentiment:
             st.write(f"Sentimen dari umpan balik Anda adalah: {sentiment}")
+        st.session_state['feedback'] = feedback
     return feedback
 
 # Main function
@@ -185,7 +183,8 @@ def main():
                                 st.session_state.confirm = False
 
                             confirm = st.button("Konfirmasi Pilihan")
-                            if confirm:
+                            if confirm or st.session_state.confirm:
+                                st.session_state.confirm = True
                                 st.write("Berikut beberapa buku yang mungkin menarik bagi Anda:")
                                 recommendations_by_genre, genre_sim_scores = get_genre_recommendations(selected_genres)
                                 recommended_books, overall_sim_scores = get_genre_recommendations_with_preferences(selected_genres, reading_type, popularity, rating_influence, selected_book)
