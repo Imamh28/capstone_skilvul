@@ -21,6 +21,7 @@ authenticator = IAMAuthenticator(api_key)
 nlu = NaturalLanguageUnderstandingV1(
     version='2021-08-01',
     authenticator=authenticator
+    disable_ssl_verification=True  # Tambahkan opsi ini
 )
 
 # Set service URL
