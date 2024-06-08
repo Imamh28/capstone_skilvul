@@ -6,11 +6,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from ibm_watson import NaturalLanguageUnderstandingV1
 from ibm_watson.natural_language_understanding_v1 import Features, SentimentOptions
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
-import ssl
-
-ssl_context = ssl.create_default_context()
-ssl_context.check_hostname = False
-ssl_context.verify_mode = ssl.CERT_NONE
+import requests
 
 # Initialize IBM NLU
 api_key = 'sSXHNVTN-iWR7PhHP3t2lLFr2k7oYNn4YXYXBM99wesI'
@@ -22,7 +18,8 @@ nlu = NaturalLanguageUnderstandingV1(
     authenticator=authenticator
 )
 
-nlu.set_service_url(service_url, ssl_context=ssl_context)
+# Set service URL
+nlu.set_service_url(service_url)
 
 # Function to analyze feedback using IBM NLU
 def analyze_feedback(feedback_text):
@@ -36,7 +33,7 @@ def analyze_feedback(feedback_text):
     except Exception as e:
         st.error(f"Error analyzing feedback: {e}")
         return None
-        
+
 # Load dataset
 df_buku = pd.read_csv('books.csv')
 df_buku['description'] = df_buku['description'].fillna('')
@@ -147,74 +144,4 @@ def get_user_feedback():
 
 # Main function
 def main():
-    st.title("Bookverse: Website yang memberikan rekomendasi buku bacaan untuk Anda")
-    st.markdown("---")
-    st.write("Halo! Saya di sini untuk membantu Anda menemukan rekomendasi buku berdasarkan preferensi Anda.")
-
-    name = st.text_input("Silakan masukkan nama Anda:")
-
-    if name:
-        st.write(f"Hai {name}! Siap untuk menemukan buku-buku keren sesuai selera Anda? Ayo kita mulai!")
-
-        top_25_genre = df_buku['categories'].value_counts().index[:25]
-        selected_genres = st.multiselect("Pilih genre/jenis buku favoritmu (top 25 genre)", top_25_genre)
-
-        if selected_genres:
-            reading_type = st.radio("Manakah tipe kamu saat membaca buku?", ('Menyelesaikan buku dalam sekali duduk', 'Santai dalam membaca'), index=None)
-
-            if reading_type:
-                popularity = st.radio("Apakah tingkat kepopuleran buku mempengaruhi keputusan Anda dalam memilih buku?", ('Ya', 'Tidak'), index=None)
-
-                if popularity:
-                    rating_influence = st.radio("Apakah rating buku mempengaruhi keputusan Anda dalam memilih buku?", ('Ya', 'Tidak'), index=None)
-
-                    if rating_influence:
-                        popular_titles = get_popular_titles_by_genre(selected_genres)
-
-                        st.write("Pilih judul buku yang membuatmu tertarik:")
-                        popular_titles.insert(0, "Pilih buku...")  # Add placeholder
-                        selected_book = st.selectbox("Pilih buku:", popular_titles, index=0)
-
-                        if selected_book != "Pilih buku...":
-                            st.write("Yuk, kita cek apa saja pilihan kamu:")
-                            st.write(f"Nama                : {name}")
-                            st.write(f"Genre Favorit       : {', '.join(selected_genres)}")
-                            st.write(f"Tipe Membaca        : {reading_type}")
-                            st.write(f"Pengaruh Kepopuleran: {popularity}")
-                            st.write(f"Pengaruh Rating     : {rating_influence}")
-                            st.write(f"Judul buku yang tertarik   : {selected_book}")
-
-                            if 'confirm' not in st.session_state:
-                                st.session_state.confirm = False
-
-                            confirm = st.button("Konfirmasi Pilihan")
-                            if confirm or st.session_state.confirm:
-                                st.session_state.confirm = True
-                                st.write("Berikut beberapa buku yang mungkin menarik bagi Anda:")
-                                recommendations_by_genre, genre_sim_scores = get_genre_recommendations(selected_genres)
-                                recommended_books, overall_sim_scores = get_genre_recommendations_with_preferences(selected_genres, reading_type, popularity, rating_influence, selected_book)
-
-                                if not recommendations_by_genre:
-                                    st.write("Maaf, kami tidak dapat menemukan rekomendasi berdasarkan genre yang dipilih.")
-                                else:
-                                    for genre, recommendations in recommendations_by_genre.items():
-                                        st.write(f"Rekomendasi berdasarkan genre {genre}:")
-                                        st.dataframe(recommendations)
-
-                                        st.write(f"Similarity Scores untuk rekomendasi berdasarkan genre {genre}:")
-                                        st.write(genre_sim_scores[genre])
-
-                                    st.write("Rekomendasi berdasarkan keseluruhan:")
-                                    st.dataframe(recommended_books[['title', 'authors', 'categories']].head(15))
-
-                                    st.write("Similarity Scores untuk rekomendasi berdasarkan keseluruhan:")
-                                    st.write(overall_sim_scores[:15])
-
-                                feedback = get_user_feedback()
-                                if feedback:
-                                    st.write("Terima kasih atas umpan balik Anda!")
-                                else:
-                                    st.write("Kami menunggu masukan dari Anda! Silakan isi feedback Anda di atas untuk membantu kami memberikan rekomendasi yang lebih baik.")
-
-if __name__ == "__main__":
-    main()
+    st
