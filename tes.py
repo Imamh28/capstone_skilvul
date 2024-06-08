@@ -43,8 +43,8 @@ cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
 # Function to get popular title by category
 def get_popular_title(df, category):
     category_df = df[df['categories'] == category]
-    popular_book = category_df.sort_values(by='average_rating', ascending=False).iloc[0]
-    return popular_book['title']
+    popular_books = category_df.sort_values(by='average_rating', ascending=False).iloc[:3]
+    return popular_books['title'].tolist()
 
 # Popular genres
 genre_popular = ['Fiction', 'Juvenile Fiction', 'Biography & Autobiography', 'Young Adult Fiction', 'Drama',
@@ -126,8 +126,8 @@ def get_popular_titles_by_genre(selected_genres, df=df_buku):
     for genre in selected_genres:
         category_df = df[df['categories'] == genre]
         if not category_df.empty:
-            popular_book = category_df.sort_values(by='average_rating', ascending=False).iloc[0]
-            popular_titles_by_genre.append(popular_book['title'])
+            popular_books = category_df.sort_values(by='average_rating', ascending=False).iloc[:3]
+            popular_titles_by_genre.extend(popular_books['title'].tolist())
     return popular_titles_by_genre
 
 # Function to get user feedback
