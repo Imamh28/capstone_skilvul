@@ -16,7 +16,9 @@ nlu = NaturalLanguageUnderstandingV1(
     version='2021-08-01',
     authenticator=authenticator
 )
-nlu.set_service_url(service_url)
+
+# Set service URL with SSL verification disabled
+nlu.set_service_url(service_url, verify=False)
 
 # Function to analyze feedback using IBM NLU
 def analyze_feedback(feedback_text):
@@ -137,7 +139,6 @@ def get_user_feedback():
         sentiment = analyze_feedback(feedback)
         if sentiment:
             st.write(f"Sentimen dari umpan balik Anda adalah: {sentiment}")
-        st.session_state['feedback'] = feedback
     return feedback
 
 # Main function
