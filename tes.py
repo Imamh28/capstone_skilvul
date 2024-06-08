@@ -181,6 +181,9 @@ def main():
                             st.write(f"Pengaruh Rating     : {rating_influence}")
                             st.write(f"Judul buku yang tertarik   : {selected_book}")
 
+                            if 'confirm' not in st.session_state:
+                                st.session_state.confirm = False
+
                             confirm = st.button("Konfirmasi Pilihan")
                             if confirm:
                                 st.write("Berikut beberapa buku yang mungkin menarik bagi Anda:")
