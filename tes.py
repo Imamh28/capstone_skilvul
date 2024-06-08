@@ -18,7 +18,7 @@ nlu = NaturalLanguageUnderstandingV1(
 )
 
 # Set service URL
-nlu.set_service_url(service_url)
+nlu.set_service_url(service_url, verify=False)
 
 # Function to analyze feedback using IBM NLU
 def analyze_feedback(feedback_text):
